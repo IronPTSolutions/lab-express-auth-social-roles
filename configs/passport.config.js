@@ -52,7 +52,5 @@ passport.use('facebook-auth', new FBStrategy({
 }, authenticateOAuthUser));
 
 function authenticateOAuthUser(accessToken, refreshToken, profile, next) {
-  // Should find de user by profile.provider.
-  // if it exists, call next
-  // if it doesn't, create it with profile data
+ 
 }
