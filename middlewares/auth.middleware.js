@@ -7,7 +7,7 @@ module.exports.isAuthenticated = (req, res, next) => {
     res.status(401)
     .redirect('/sessions/create')
   }
-  next();
+  
 }
 
 module.exports.checkRole = (role) => {

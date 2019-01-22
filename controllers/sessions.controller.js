@@ -5,7 +5,7 @@ module.exports.create = (req, res, next) => {
 }
 
 module.exports.doCreate = (req, res, next) => {
-  function renderWithErrors(error) {
+  function renderWithErrors(errors) {
     res.status(400).render('sessions/create', {
       users: req.body,
       errors: errors
@@ -44,15 +44,15 @@ module.exports.delete = (req, res, next) => {
 module.exports.createWithIDPCallback = (req, res, next) => {
   passport.authenticate(`${req.params.provider}-auth`, (error, user) => {
     if (error) {
-      next (error);
+      next(error);
     } else {
       req.login(user, (error) => {
         if (error) {
           next(error)
         } else {
-          res.redirect('/users')
+          res.redirect(`/users`)
         }
-      })
+      });
     }
   })(req, res, next);
 }
