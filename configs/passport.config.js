@@ -52,7 +52,30 @@ passport.use('facebook-auth', new FBStrategy({
 }, authenticateOAuthUser));
 
 function authenticateOAuthUser(accessToken, refreshToken, profile, next) {
-  // Should find de user by profile.provider.
-  // if it exists, call next
-  // if it doesn't, create it with profile data
+
+  let socialID = `${profile.provider}Id`;  // Esto proporciona un provider para llegar a dentro de social ( que es un valor del modelo usuario ), que suma al nombre del provider (google o facebook) el string 'Id'
+   User.findOne( { [`social.${socialID}`] : profile.id } ) // checkea si el profile id que da google o facebook coincide con el valor de google o facebook en social.
+    .then(user => {
+      if (user){
+        next(null, user);
+      } else {
+        user = new User({
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          password: Math.random().toString(36).substring(7),
+          social:{
+            [socialID] : profile.id // para meter una clave de un objeto de una variable, se mete dentro de corchetes.
+          }
+        })
+        return user.save()
+          .then(user => {
+            next(null, user);
+          });
+      }
+      
+    })
+    .catch(error => next(error));
 }
+
+
+
