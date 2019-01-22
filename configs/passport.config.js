@@ -73,4 +73,4 @@ function authenticateOAuthUser(accessToken, refreshToken, profile, next) {
         }
       })
       .catch(error => next(error));
-}
+};
