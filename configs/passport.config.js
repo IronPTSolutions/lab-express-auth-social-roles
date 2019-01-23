@@ -52,7 +52,25 @@ passport.use('facebook-auth', new FBStrategy({
 }, authenticateOAuthUser));
 
 function authenticateOAuthUser(accessToken, refreshToken, profile, next) {
-  // Should find de user by profile.provider.
-  // if it exists, call next
-  // if it doesn't, create it with profile data
+  const social = `${profile.provider}Id`;
+  User.findOne({[`social.${social}`]: profile.id})
+  .then (user => {
+    if (user){
+      next(null, user);
+    } else {
+        user = new User({
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          password: Math.random().toString(36).substring(7),
+          social:{
+            [social]: profile.id
+          }
+        });
+        return user.save()
+        .then(user =>{
+          next(null, user)
+        })
+    }
+  })
+  .catch(error => next(error));
 }
