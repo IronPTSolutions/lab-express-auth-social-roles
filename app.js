@@ -14,6 +14,8 @@ require('./configs/db.config');
 require('./configs/hbs.config');
 require('./configs/passport.config');
 
+
+
 const usersRouter = require('./routes/users.routes');
 const sessionsRouter = require('./routes/sessions.routes');
 
@@ -45,6 +47,11 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((req, res, next)=>{
+  res.locals.session = req.user;
+  next();
+})
 
 app.use((req, res, next) => {
   res.locals.session = req.user;
