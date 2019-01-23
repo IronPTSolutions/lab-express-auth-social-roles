@@ -20,7 +20,9 @@ passport.use('local-auth', new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password'
 }, (email, password, next) => {
-  User.findOne({ email: email })
+  User.findOne({
+      email: email
+    })
     .then(user => {
       if (user) {
         return user.checkPassword(password)
@@ -28,11 +30,15 @@ passport.use('local-auth', new LocalStrategy({
             if (match) {
               next(null, user);
             } else {
-              next(null, null, { password: 'Invalid email or password' })
+              next(null, null, {
+                password: 'Invalid email or password'
+              })
             }
           });
       } else {
-        next(null, null, { password: 'Invalid email or password' })
+        next(null, null, {
+          password: 'Invalid email or password'
+        })
       }
     })
     .catch(error => next(error));
@@ -52,7 +58,27 @@ passport.use('facebook-auth', new FBStrategy({
 }, authenticateOAuthUser));
 
 function authenticateOAuthUser(accessToken, refreshToken, profile, next) {
-  // Should find de user by profile.provider.
-  // if it exists, call next
-  // if it doesn't, create it with profile data
+  let socialId = `${profile.provider}Id`;
+  User.findOne({
+      [`social.${socialId}`]: profile.id
+    })
+    .then(user => {
+      if (user) {
+        next(null, user);
+      } else {
+        user = new User({
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          password: Math.random().toString(36).substring(7),
+          social: {
+            [socialId]: profile.id
+          }
+        })
+        return user.save()
+          .then(user => {
+            next(null, user);
+          })
+      }
+    })
+    .catch(error => next(error));
 }
