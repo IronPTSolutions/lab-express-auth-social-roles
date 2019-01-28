@@ -10,8 +10,11 @@ module.exports.isAuthenticated = (req, res, next) => {
 }
 
 module.exports.checkRole = (role) => {
-  // should check if current user's role is the received one. Call next if OK, throw error if not!
-
-  // delete this!
-  return (req, res, next) => next();
+  return (req, res, next) => {
+    if (req.isAuthenticated() && req.user.role === role) {
+      next();
+    } else {
+      next(createError(403, 'Insufficient privileges'))
+    }
+  }
 }
